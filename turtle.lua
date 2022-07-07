@@ -167,7 +167,7 @@ for i = 1,HEIGHT/2 do
         end
         rotate(LR.LEFT)
         moveClean()
-        rotate(LR.RIGHT)
+        rotate(LR.LEFT)
     end
     moveClean(vector.new(0,2,0))
 end
