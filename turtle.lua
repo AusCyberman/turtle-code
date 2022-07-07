@@ -124,7 +124,7 @@ local function move(...)
                 end
             end
             turtle[string.lower(dir)]()
-            current_loc.y = current_loc.y + ((y > 0 and 1) or 0)
+            current_loc.y = current_loc.y + ((y > 0 and 1) or -1)
         end
     end
 end
