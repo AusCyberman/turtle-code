@@ -135,7 +135,7 @@ LENGTH = 10
 HEIGHT = 10
 
 function moveClean(posvec)
-    print("moving to " .. current_loc:add(posvec))
+    print("moving to " .. current_loc:add(posvec):tostring())
     local _, err = pcall(move, posvec)
     if err then
         if err.code == RETURN_HOME then
