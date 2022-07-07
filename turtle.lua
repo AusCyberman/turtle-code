@@ -105,12 +105,12 @@ local function move(...)
         current_loc = current_loc:add(args[1])
     end
     if x ~= 0 then
-        local angleVec = vector.new(x, 0, 0)
+        local angleVec = vector.new(x/math.abs(x), 0, 0)
         set_direction(angleVec)
         moveForward(x, angleVec)
     end
     if z ~= 0 then
-        local angleVec = vector.new(0, 0, z)
+        local angleVec = vector.new(0, 0, z/math.abs(z))
         set_direction(angleVec)
         moveForward(y, angleVec)
     end
@@ -124,6 +124,7 @@ local function move(...)
                 end
             end
             turtle[string.lower(dir)]()
+            current_loc.y = current_loc.y + ((y > 0 and 1) or 0)
         end
     end
 end
