@@ -133,7 +133,7 @@ for x = 0, WIDTH do
     for y = 0, HEIGHT do
         for z = 0, LENGTH do
             local posvec = vector.new(x,y,z)
-            print("moving to " .. posvec:to_string())
+            print("moving to " .. posvec:tostring())
             local _, err = pcall(moveTo, posvec)
             if err then
                 if err.code == RETURN_HOME then
