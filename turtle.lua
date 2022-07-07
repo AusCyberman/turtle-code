@@ -28,6 +28,7 @@ end
 local function rotate(lr)
     directionVector = rot_vec(directionVector:normalize(),lr)
     turtle["turn"..lr]()
+    print("turning "..lr)
 end
 
 local function vec_muts(avec, bvec)
