@@ -78,7 +78,7 @@ local function alt(n, f, g, mut)
 end
 
 local function moveForward(n, mut)
-    for i = 0, math.abs(n) do
+    for i = 1, math.abs(n) do
         if turtle.detect() then
             if not turtle.dig() then
                 error({ code = RETURN_HOME })
@@ -115,7 +115,7 @@ local function move(...)
     end
     if y ~= 0 then
         local dir = (y > 0 and DIR.UP) or DIR.DOWN
-        for i = 0, math.abs(y) do
+        for i = 1, math.abs(y) do
             refuel()
             if turtle["detect" .. dir]() then
                 if not turtle["dig" .. dir] then
@@ -156,8 +156,8 @@ end
 
 
 for i = 0,HEIGHT/2 do
-    for n = 0,4 do
-        for x = 0, LENGTH do
+    for n = 1,4 do
+        for x = 1, LENGTH do
             moveClean(directionVector)
             turtle.digUp()
         end
