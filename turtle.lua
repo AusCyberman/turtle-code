@@ -52,7 +52,7 @@ local function vec_muts(avec, bvec)
 end
 
 local function set_direction(vec)
-    for _, dir in ipairs(vec_muts(directionVector,vec)) do
+    for _, dir in ipairs(vec_muts(directionVector, vec)) do
         turtle["turn" .. dir]()
     end
     directionVector = vec
@@ -120,7 +120,7 @@ local function move(...)
             refuel()
             if turtle["detect" .. dir]() then
                 if not turtle["dig" .. dir] then
-                    error("COULD NOT DIG " .. DIR.DOWN)
+                    error({code = RETURN_HOME, "COULD NOT DIG " .. DIR.DOWN})
                 end
             end
             turtle[string.lower(dir)]()
@@ -142,9 +142,13 @@ for x = 0, WIDTH do
         for z = 0, LENGTH do
             local _, err = pcall(moveTo, vector.new(x, y, z))
             if err then
-                bypassFuelCheck = true
-                moveTo(start_loc)
-                print(err)
+                if err.code == RETURN_HOME then
+                    bypassFuelCheck = true
+                    moveTo(start_loc)
+                    print(err)
+                else
+                    error(err)
+                end
             end
         end
     end
