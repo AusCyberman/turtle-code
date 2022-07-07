@@ -141,7 +141,9 @@ HEIGHT = 10
 for x = 0, WIDTH do
     for y = 0, HEIGHT do
         for z = 0, LENGTH do
-            local _, err = pcall(moveTo, vector.new(x, y, z))
+            local posvec = vector.new(x,y,z)
+            print("moving to " .. posvec:to_string())
+            local _, err = pcall(moveTo, posvec)
             if err then
                 if err.code == RETURN_HOME then
                     bypassFuelCheck = true
