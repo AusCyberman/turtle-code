@@ -30,7 +30,7 @@ local function vec_muts(avec, bvec)
     if dot == 1 then
        return {} 
     elseif dot == -1 then
-        return {LR.LEFT,LR.RIGHT}
+        return {LR.LEFT,LR.LEFT}
     else
         local cross = avec:cross(bvec)
         if cross.y < 0 then
