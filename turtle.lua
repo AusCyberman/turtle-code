@@ -162,8 +162,6 @@ local function doStuff()
         for x = 2, LENGTH do
             moveClean()
             turtle.digUp()
-            turtle.digRight()
-            turtle.digLeft()
             turtle.digDown()
         end
 end
@@ -172,7 +170,7 @@ for i = 1,HEIGHT/2 do
     for n = 1,WIDTH/2 do
         doStuff()
         rotate(LR.LEFT)
-        moveClean(directionVector:mul(2))
+        moveClean()
         rotate(LR.LEFT)
         doStuff()
         rotate(LR.RIGHT)
