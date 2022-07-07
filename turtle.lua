@@ -25,21 +25,26 @@ local function rot_vec(vec, lr)
     end
 end
 
+local function rotate(lr)
+    directionVector = rot_vec(directionVector,lr)
+    turtle["turn"..lr]()
+end
+
 local function vec_muts(avec, bvec)
     local dot = avec:dot(bvec)
     if dot == 1 then
-       return {} 
+        return {}
     elseif dot == -1 then
-        return {LR.LEFT,LR.LEFT}
+        return { LR.LEFT, LR.LEFT }
     else
         local cross = avec:cross(bvec)
         if cross.y < 0 then
-            return {LR.RIGHT}
-        else 
-            return {LR.LEFT}
+            return { LR.RIGHT }
+        else
+            return { LR.LEFT }
         end
     end
-            
+
 end
 
 local function set_direction(vec)
@@ -96,12 +101,12 @@ local function move(...)
         current_loc = current_loc:add(args[1])
     end
     if x ~= 0 then
-        local angleVec = vector.new(x/math.abs(x), 0, 0)
+        local angleVec = vector.new(x / math.abs(x), 0, 0)
         set_direction(angleVec)
         moveForward(x, angleVec)
     end
     if z ~= 0 then
-        local angleVec = vector.new(0, 0, z/math.abs(z))
+        local angleVec = vector.new(0, 0, z / math.abs(z))
         set_direction(angleVec)
         moveForward(y, angleVec)
     end
@@ -111,7 +116,7 @@ local function move(...)
             refuel()
             if turtle["detect" .. dir]() then
                 if not turtle["dig" .. dir] then
-                    error({code = RETURN_HOME, "COULD NOT DIG " .. DIR.DOWN})
+                    error({ code = RETURN_HOME, "COULD NOT DIG " .. DIR.DOWN })
                 end
             end
             turtle[string.lower(dir)]()
@@ -129,21 +134,30 @@ WIDTH = 10
 LENGTH = 10
 HEIGHT = 10
 
-for x = 0, WIDTH do
-    for y = 0, HEIGHT do
-        for z = 0, LENGTH do
-            local posvec = vector.new(x,y,z)
-            print("moving to " .. posvec:tostring())
-            local _, err = pcall(moveTo, posvec)
-            if err then
-                if err.code == RETURN_HOME then
-                    bypassFuelCheck = true
-                    moveTo(start_loc)
-                    print(err)
-                else
-                    error(err)
-                end
-            end
+function moveClean(posvec)
+    print("moving to " .. posvec:tostring())
+    local _, err = pcall(move, posvec)
+    if err then
+        if err.code == RETURN_HOME then
+            bypassFuelCheck = true
+            moveTo(start_loc)
+            print(err)
+        else
+            error(err)
         end
     end
+
+end
+
+
+
+for i = 0,HEIGHT/2 do
+    for n = 0,4 do
+        for x = 0, LENGTH do
+            moveClean(directionVector)
+            turtle.digUp()
+        end
+        rotate(LR.LEFT)
+    end
+    moveClean(vector.new(0,2,0))
 end
