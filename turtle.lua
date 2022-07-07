@@ -26,29 +26,20 @@ local function rot_vec(vec, lr)
 end
 
 local function vec_muts(avec, bvec)
-    if avec.x == bvec.x and avec.z == bvec.z then
-        return {}
+    local dot = avec:dot(bvec)
+    if dot == 1 then
+       return {} 
+    elseif dot == -1
+        return {LR.LEFT,LR.RIGHT}
     else
-        local turns = {}
-        if avec.x == bvec.z then
-            if avec.x == 1 then
-                table.insert(turns, LR.LEFT)
-            else
-                table.insert(turns, LR.RIGHT)
-            end
-        elseif bvec.x == -1 then
-            table.insert(turns, LR.LEFT)
-            table.insert(turns, LR.LEFT)
-        else
-            if avec.x == 1 then
-                table.insert(turns, LR.RIGHT)
-            else
-                table.insert(turns, LR.LEFT)
-            end
-
+        local cross = avec:cross(bvec)
+        if cross.y < 0 then
+            return {LR.RIGHT}
+        else 
+            return {LR.LEFT}
         end
-        return turns
     end
+            
 end
 
 local function set_direction(vec)
