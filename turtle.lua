@@ -19,9 +19,9 @@ local DIR = { FORWARD = "", UP = "Up", DOWN = "Down" }
 
 local function rot_vec(vec, lr)
     if lr == LR.LEFT then
-        return vec:new(vec.z, vec.y, vec.x)
+        return vector.new(vec.z, vec.y, vec.x)
     elseif lr == LR.RIGHT then
-        return vec:new(vec.z, vec.y, -1 * vec.x)
+        return vector.new(vec.z, vec.y, -1 * vec.x)
     end
 end
 
@@ -135,7 +135,7 @@ LENGTH = 10
 HEIGHT = 10
 
 function moveClean(posvec)
-    print("moving to " .. posvec:tostring())
+    print("moving to " .. current_loc:add(posvec))
     local _, err = pcall(move, posvec)
     if err then
         if err.code == RETURN_HOME then
