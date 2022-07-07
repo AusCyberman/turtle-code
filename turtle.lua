@@ -147,6 +147,7 @@ function moveClean(posvec)
             bypassFuelCheck = true
             moveTo(start_loc)
             print(err)
+            error("final error")
         else
             error(err)
         end
