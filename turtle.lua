@@ -86,6 +86,7 @@ local function moveForward(n, mut)
         end
         turtle.forward()
         refuel()
+        print("at iteration:" .. i)
         current_loc = current_loc:add(mut)
     end
 end
