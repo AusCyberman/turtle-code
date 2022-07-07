@@ -134,11 +134,12 @@ local function moveTo(vec3)
     move(diffVec)
 end
 
-WIDTH = 10
+WIDTH = 5
 LENGTH = 10
 HEIGHT = 10
 
 function moveClean(posvec)
+    posvec = posvec or directionVector
     print("dirvec " .. posvec:tostring())
     print("moving to " .. current_loc:add(posvec):tostring())
     local _, err = pcall(move, posvec)
@@ -157,13 +158,16 @@ end
 
 
 
-for i = 0,HEIGHT/2 do
-    for n = 1,4 do
-        for x = 1, LENGTH do
-            moveClean(directionVector)
+for i = 1,HEIGHT/2 do
+    for n = 1,WIDTH do
+        for x = 2, LENGTH do
+            moveClean()
             turtle.digUp()
+            turtle.digDown()
         end
         rotate(LR.LEFT)
+        moveClean()
+        rotate(LR.RIGHT)
     end
     moveClean(vector.new(0,2,0))
 end
