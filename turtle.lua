@@ -112,7 +112,7 @@ local function move(...)
         print("moving on z")
         local angleVec = vector.new(0, 0, z / math.abs(z))
         set_direction(angleVec)
-        moveForward(y, angleVec)
+        moveForward(z, angleVec)
     end
     if y ~= 0 then
         local dir = (y > 0 and DIR.UP) or DIR.DOWN
