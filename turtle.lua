@@ -26,7 +26,7 @@ local function rot_vec(vec, lr)
 end
 
 local function rotate(lr)
-    directionVector = rot_vec(directionVector,lr)
+    directionVector = rot_vec(directionVector:normalize(),lr)
     turtle["turn"..lr]()
 end
 
@@ -135,6 +135,7 @@ LENGTH = 10
 HEIGHT = 10
 
 function moveClean(posvec)
+    print("dirvec " .. posvec:tostring())
     print("moving to " .. current_loc:add(posvec):tostring())
     local _, err = pcall(move, posvec)
     if err then
