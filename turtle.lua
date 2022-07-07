@@ -101,11 +101,13 @@ local function move(...)
         current_loc = current_loc:add(args[1])
     end
     if x ~= 0 then
+        print("moving on x")
         local angleVec = vector.new(x / math.abs(x), 0, 0)
         set_direction(angleVec)
         moveForward(x, angleVec)
     end
     if z ~= 0 then
+        print("moving on z")
         local angleVec = vector.new(0, 0, z / math.abs(z))
         set_direction(angleVec)
         moveForward(y, angleVec)
