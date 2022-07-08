@@ -90,7 +90,7 @@ function Turtle.refuel()
         turtle.refuel()
     end
     if turtle.getFuelLevel() > distance then
-        error({ code = ERRORS.COULD_NOT_BREAK_BLOCK })
+        error({ code = ERRORS.OUT_OF_FUEL })
     end
 
 end
