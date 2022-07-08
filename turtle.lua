@@ -7,7 +7,6 @@ local ERRORS = {
     COULD_NOT_BREAK_BLOCK = 72
 }
 
-
 function math.sign(n)
     return (n > 0 and 1) or (n == 0 and 0) or -1
 end
@@ -157,6 +156,7 @@ function Turtle.checkInventory()
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
         local det = turtle.getItemDetail().name
+        print(det)
         if det == "minecraft:stone" or det == "minecraft:dirt" then
             turtle.drop()
             cleaned = true
@@ -180,6 +180,7 @@ local function moveClean(posvec)
             error("Returned home!")
             moveClean(posvec)
         elseif err.code == ERRORS.INVENTORY_FULL then
+            print(inventory full)
             local oldPosVec = current_loc
             local oldDirVec = directionVector
             Turtle.moveTo(start_loc)
@@ -215,7 +216,7 @@ local function doStuff()
 end
 
 local a, b = LR.LEFT, LR.RIGHT
-for i = 1, HEIGHT / 2 do
+for i = 1, HEIGHT / 3 do
     for n = 1, WIDTH / 2 do
         doStuff()
         rotate(a)
@@ -227,5 +228,5 @@ for i = 1, HEIGHT / 2 do
         rotate(b)
     end
     a, b = b, a
-    moveClean(vector.new(0, 2, 0))
+    moveClean(vector.new(0, 3, 0))
 end
