@@ -80,15 +80,16 @@ end
 
 function Turtle.refuel()
     if bypassFuelCheck then return end
-    local distance = start_loc:sub(directionVector)
-    if turtle.getFuelLevel() > (distance.x + distance.y + distance.z) then
+    local distanceV = start_loc:sub(directionVector)
+    local distance = distanceV.x + distanceV.y + distanceV.z
+    if turtle.getFuelLevel() > distance then
         return
     end
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
         turtle.refuel()
     end
-    if turtle.getFuelLevel() > start_loc:sub(directionVector) then
+    if turtle.getFuelLevel() > distance then
         error({ code = ERRORS.COULD_NOT_BREAK_BLOCK })
     end
 
