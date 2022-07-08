@@ -80,8 +80,8 @@ end
 
 function Turtle.refuel()
     if bypassFuelCheck then return end
-    local distanceV = start_loc:sub(directionVector)
-    local distance = distanceV.x + distanceV.y + distanceV.z
+    local distanceV = start_loc:sub(current_loc)
+    local distance = math.abs(distanceV.x) + math.abs(distanceV.y) + math.abs(distanceV.z)
     if turtle.getFuelLevel() > distance then
         return
     end
