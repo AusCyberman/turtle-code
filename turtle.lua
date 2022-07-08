@@ -237,5 +237,5 @@ for i = 1, HEIGHT / 3 do
         rotate(b)
     end
     a, b = b, a
-    moveClean(vector.new(0, -3, 0))
+    moveClean(vector.new(0, 3, 0))
 end
