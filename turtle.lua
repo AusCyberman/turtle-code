@@ -1,3 +1,4 @@
+Turtle ={}
 local SLOTS_COUNT = 16
 
 local ERRORS = {
@@ -62,16 +63,15 @@ end
 
 local bypassFuelCheck = false
 
-Turtle = {}
 
-function Turtle.mt.__index(key) 
+setmetatable(Turtle,{ __index = function (key) 
     local b,start = key:find("dig",1)
     if b ~= nil then
         Turtle.dig(key:sub(start)) 
     else 
         return Turtle[key]
     end
-end
+end})
 
 function Turtle.dig(dir)
    if turtle["detect"..dir] then
