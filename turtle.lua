@@ -134,9 +134,9 @@ local function moveTo(vec3)
     move(diffVec)
 end
 
-WIDTH = 5
+WIDTH = 10
 LENGTH = 10
-HEIGHT = 10
+HEIGHT = 5
 
 function moveClean(posvec)
     posvec = posvec or directionVector
@@ -165,16 +165,18 @@ local function doStuff()
             turtle.digDown()
         end
 end
-
+local a,b = LR.LEFT, LR.RIGHT
 for i = 1,HEIGHT/2 do
     for n = 1,WIDTH/2 do
         doStuff()
-        rotate(LR.LEFT)
+        rotate(a)
         moveClean()
-        rotate(LR.LEFT)
+        rotate(a)
         doStuff()
-        rotate(LR.RIGHT)
-        rotate(LR.RIGHT)
+        rotate(b)
+        moveClean()
+        rotate(b)
     end
+    a,b = b,a
     moveClean(vector.new(0,2,0))
 end
