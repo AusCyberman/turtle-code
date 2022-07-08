@@ -1,5 +1,12 @@
+vector = {}
+turtle = {}
 local SLOTS_COUNT = 16
-local RETURN_HOME = 69
+
+local ERRORS = {
+    OUT_OF_FUEL = 69,
+    INVENTORY_FULL = 71,
+    COULD_NOT_BREAK_BLOCK = 72
+}
 
 
 function math.sign(n)
@@ -26,12 +33,12 @@ local function rot_vec(vec, lr)
 end
 
 local function rotate(lr)
-    directionVector = rot_vec(directionVector:normalize(),lr)
-    turtle["turn"..lr]()
-    print("turning "..lr)
+    directionVector = rot_vec(directionVector:normalize(), lr)
+    turtle["turn" .. lr]()
+    print("turning " .. lr)
 end
 
-local function vec_muts(avec, bvec)
+local function getTurnsToVec(avec, bvec)
     local dot = avec:dot(bvec)
     if dot == 1 then
         return {}
@@ -49,7 +56,7 @@ local function vec_muts(avec, bvec)
 end
 
 local function set_direction(vec)
-    for _, dir in ipairs(vec_muts(directionVector, vec)) do
+    for _, dir in ipairs(getTurnsToVec(directionVector, vec)) do
         turtle["turn" .. dir]()
     end
     directionVector = vec
@@ -57,10 +64,30 @@ end
 
 local bypassFuelCheck = false
 
-local function refuel()
+Turtle = {}
+
+function Turtle.mt.__index(key) 
+    local b,start = string.find("dig",1)
+    if b ~= nil then
+        Turtle.dig(key:sub(start)) 
+    else 
+        return Turtle[key]
+    end
+end
+
+function Turtle.dig(dir)
+   if turtle["detect"..dir] then
+        Turtle.checkInventory()
+        if not turtle["dig"..dir]()  then
+           error({code = ERRORS.COULD_NOT_BREAK_BLOCK}) 
+        end
+   end
+end
+
+function Turtle.refuel()
     if bypassFuelCheck then return end
     local distance = start_loc:sub(directionVector)
-    if turtle.getFuelLevel() > distance:length() then
+    if turtle.getFuelLevel() > (distance.x + distance.y + distance.z) then
         return
     end
     for i = 1, SLOTS_COUNT do
@@ -68,31 +95,22 @@ local function refuel()
         turtle.refuel()
     end
     if turtle.getFuelLevel() > start_loc:sub(directionVector) then
-        error({ code = RETURN_HOME })
+        error({ code = ERRORS.COULD_NOT_BREAK_BLOCK })
     end
 
 end
 
-local function alt(n, f, g, mut)
-    local sig = math.sign(n)
-    return (sig == 1 and f) or g, sig * n, mut:mul(-1)
-end
-
-local function moveForward(n, mut)
+function Turtle.moveForward(n, mut)
     for i = 1, math.abs(n) do
-        if turtle.detect() then
-            if not turtle.dig() then
-                error({ code = RETURN_HOME })
-            end
-        end
+        Turtle.dig()
         turtle.forward()
-        refuel()
+        Turtle.refuel()
         print("at iteration:" .. i)
         current_loc = current_loc:add(mut)
     end
 end
 
-local function move(...)
+function Turtle.move(...)
     local args = { ... }
     local x, y, z
     if #args == 3 then
@@ -106,49 +124,82 @@ local function move(...)
         print("moving on x")
         local angleVec = vector.new(x / math.abs(x), 0, 0)
         set_direction(angleVec)
-        moveForward(x, angleVec)
+        Turtle.moveForward(x, angleVec)
     end
     if z ~= 0 then
         print("moving on z")
         local angleVec = vector.new(0, 0, z / math.abs(z))
         set_direction(angleVec)
-        moveForward(z, angleVec)
+        Turtle.moveForward(z, angleVec)
     end
     if y ~= 0 then
         local dir = (y > 0 and DIR.UP) or DIR.DOWN
         for i = 1, math.abs(y) do
-            refuel()
-            if turtle["detect" .. dir]() then
-                if not turtle["dig" .. dir] then
-                    error({ code = RETURN_HOME, "COULD NOT DIG " .. DIR.DOWN })
-                end
-            end
+            Turtle.refuel()
+            Turtle.dig(dir)
             turtle[string.lower(dir)]()
             current_loc.y = current_loc.y + ((y > 0 and 1) or -1)
         end
     end
 end
 
-local function moveTo(vec3)
+function Turtle.moveTo(vec3)
     local diffVec = vec3:sub(current_loc)
-    move(diffVec)
+    Turtle.move(diffVec)
 end
 
-WIDTH = 10
-LENGTH = 10
-HEIGHT = 5
 
-function moveClean(posvec)
+
+
+function Turtle.checkInventory()
+    local full = true
+    local i = 1
+    while SLOTS_COUNT >= i and full do
+        turtle.select(n)
+        full = full and turtle.getItemSpace() == 0
+        i = i + 1
+    end
+    if not full then return end
+    local cleaned = false
+    for i = 1, SLOTS_COUNT do
+        turtle.select(i)
+        local det = turtle.getItemDetail().name
+        if det == "minecraft:stone" or det == "minecraft:dirt" then
+            turtle.drop()
+            cleaned = true
+        end
+    end
+    if not cleaned then
+        error { code = ERRORS.INVENTORY_FULL }
+    end
+end
+
+local function moveClean(posvec)
     posvec = posvec or directionVector
     print("dirvec " .. posvec:tostring())
     print("moving to " .. current_loc:add(posvec):tostring())
-    local _, err = pcall(move, posvec)
+    local _, err = pcall(Turtle.move, posvec)
     if err then
-        if err.code == RETURN_HOME then
+        if err.code == ERRORS.OUT_OF_FUEL then
             bypassFuelCheck = true
-            moveTo(start_loc)
+            Turtle.moveTo(start_loc)
             print(err)
-            error("final error")
+            error("Returned home!")
+        elseif err.code == ERRORS.INVENTORY_FULL then
+            local oldPosVec = current_loc
+            local oldDirVec = directionVector
+            Turtle.moveTo(start_loc)
+            for i =1, SLOTS_COUNT do
+                turtle.select(i)
+                turtle.dropDown()
+            end
+            Turtle.checkInventory()
+            local distance = start_loc:sub(oldPosVec)
+            if turtle.getFuelLevel() > distance.x + distance.y + distance.z then 
+                error("Out Of Fuel!")
+            end
+            Turtle.moveTo(oldPosVec)
+            Turtle.setDirection(oldDirVec)
         else
             error(err)
         end
@@ -156,18 +207,22 @@ function moveClean(posvec)
 
 end
 
+WIDTH = 10
+LENGTH = 10
+HEIGHT = 5
 
 
-local function doStuff() 
-        for x = 2, LENGTH do
-            moveClean()
-            turtle.digUp()
-            turtle.digDown()
-        end
+local function doStuff()
+    for x = 2, LENGTH do
+        moveClean()
+        Turtle.digUp()
+        Turtle.digDown()
+    end
 end
-local a,b = LR.LEFT, LR.RIGHT
-for i = 1,HEIGHT/2 do
-    for n = 1,WIDTH/2 do
+
+local a, b = LR.LEFT, LR.RIGHT
+for i = 1, HEIGHT / 2 do
+    for n = 1, WIDTH / 2 do
         doStuff()
         rotate(a)
         moveClean()
@@ -177,6 +232,6 @@ for i = 1,HEIGHT/2 do
         moveClean()
         rotate(b)
     end
-    a,b = b,a
-    moveClean(vector.new(0,2,0))
+    a, b = b, a
+    moveClean(vector.new(0, 2, 0))
 end
