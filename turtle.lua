@@ -100,7 +100,9 @@ function Turtle.moveForward(n, mut)
     for i = 1, math.abs(n) do
         Turtle.dig()
         Turtle.refuel()
-        turtle.forward()
+        if not turtle.forward()  then
+            error("Could not move forward")
+        end
         print("at iteration:" .. i)
         current_loc = current_loc:add(mut)
     end
@@ -133,7 +135,9 @@ function Turtle.move(...)
         for i = 1, math.abs(y) do
             Turtle.refuel()
             Turtle.dig(dir)
-            turtle[string.lower(dir)]()
+            if not turtle[string.lower(dir)]() then 
+                error("Could not move ".. dir) 
+            end
             current_loc.y = current_loc.y + ((y > 0 and 1) or -1)
         end
     end
