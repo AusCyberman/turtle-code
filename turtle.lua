@@ -70,7 +70,6 @@ Turtle.digDown = function() Turtle.dig("Down") end
 function Turtle.dig(dir)
     dir = dir or ""
     if turtle["detect" .. dir]() then
-        Turtle.checkInventory()
         turtle.select(1)
         if not turtle["dig" .. dir]() then
             error({ code = ERRORS.COULD_NOT_BREAK_BLOCK })
@@ -90,7 +89,7 @@ function Turtle.refuel()
         turtle.select(i)
         turtle.refuel()
     end
-    if turtle.getFuelLevel() < distance then
+    if turtle.getFuelLevel() <= distance then
         error({ code = ERRORS.OUT_OF_FUEL })
     end
 
@@ -144,7 +143,7 @@ function Turtle.move(...)
 end
 
 function Turtle.moveTo(vec3)
-    local diffVec = vec3:sub(current_loc)
+    local diffVec = current_loc:sub(vec3)
     Turtle.move(diffVec)
 end
 
@@ -218,6 +217,7 @@ HEIGHT = 30
 local function doStuff()
     for x = 2, LENGTH do
         moveClean()
+        Turtle.checkInventory()
     end
 end
 
