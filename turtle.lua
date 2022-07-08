@@ -154,11 +154,13 @@ function Turtle.checkInventory()
     local full = true
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
+        if turtle.getItemCount() > 0 then 
         local det = turtle.getItemDetail().name
         if det == "minecraft:cobblestone" or det == "minecraft:dirt" then
             turtle.drop()
             cleaned = true
         end
+    end
         full = full and (turtle.getItemCount() > 0)
     end
     if not full then return end
