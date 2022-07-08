@@ -148,7 +148,7 @@ function Turtle.checkInventory()
     local i = 1
     while SLOTS_COUNT >= i and full do
         turtle.select(i)
-        full = full and turtle.getItemSpace() == 0
+        full = full and (turtle.getItemCount() > 0)
         i = i + 1
     end
     if not full then return end
