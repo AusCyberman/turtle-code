@@ -177,6 +177,7 @@ local function moveClean(posvec)
             Turtle.moveTo(start_loc)
             print(err)
             error("Returned home!")
+            moveClean(posvec)
         elseif err.code == ERRORS.INVENTORY_FULL then
             local oldPosVec = current_loc
             local oldDirVec = directionVector
@@ -192,6 +193,7 @@ local function moveClean(posvec)
             end
             Turtle.moveTo(oldPosVec)
             Turtle.setDirection(oldDirVec)
+            moveClean(posvec)
         else
             error(err)
         end
