@@ -217,8 +217,8 @@ HEIGHT = 30
 local function doStuff()
     for x = 2, LENGTH do
         moveClean()
-        Turtle.checkInventory()
     end
+    Turtle.checkInventory()
 end
 
 local a, b = LR.LEFT, LR.RIGHT
