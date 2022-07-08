@@ -71,7 +71,7 @@ function Turtle.dig(dir)
     dir = dir or ""
     if turtle["detect" .. dir]() then
         Turtle.checkInventory()
-        turtle.select(i)
+        turtle.select(1)
         if not turtle["dig" .. dir]() then
             error({ code = ERRORS.COULD_NOT_BREAK_BLOCK })
         end
