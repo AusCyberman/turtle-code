@@ -85,6 +85,7 @@ function Turtle.refuel()
     if turtle.getFuelLevel() > distance then
         return
     end
+    print("NO FUEL!!!")
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
         turtle.refuel()
@@ -98,8 +99,8 @@ end
 function Turtle.moveForward(n, mut)
     for i = 1, math.abs(n) do
         Turtle.dig()
-        turtle.forward()
         Turtle.refuel()
+        turtle.forward()
         print("at iteration:" .. i)
         current_loc = current_loc:add(mut)
     end
