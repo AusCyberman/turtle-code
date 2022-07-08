@@ -64,7 +64,7 @@ end
 local bypassFuelCheck = false
 
 
-setmetatable(Turtle,{ __index = function (key) 
+setmetatable(Turtle,{ __index = function (self,key) 
     local b,start = key:find("dig",1)
     if b ~= nil then
         Turtle.dig(key:sub(start+1,#key)) 
