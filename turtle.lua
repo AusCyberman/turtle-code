@@ -41,7 +41,6 @@ local function moveRaw()
     while not turtle.forward() do end
 end
 
-
 local function getTurnsToVec(avec, bvec)
     local dot = avec:dot(bvec)
     if dot == 1 then
@@ -116,10 +115,8 @@ function Turtle.move(...)
     local x, y, z
     if #args == 3 then
         x, y, z = table.unpack(args)
-        current_loc = current_loc:add(vector.new(x, y, z))
     else
         x, y, z = args[1].x, args[1].y, args[1].z
-        current_loc = current_loc:add(args[1])
     end
     if x ~= 0 then
         print("moving on x")
@@ -154,12 +151,12 @@ function Turtle.checkInventory()
     local full = true
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
-        if turtle.getItemCount() > 0 then 
-        local det = turtle.getItemDetail().name
-        if det == "minecraft:cobblestone" or det == "minecraft:dirt" then
-            turtle.drop()
+        if turtle.getItemCount() > 0 then
+            local det = turtle.getItemDetail().name
+            if det == "minecraft:cobblestone" or det == "minecraft:dirt" or det == "minecraft.stone" then
+                turtle.drop()
+            end
         end
-    end
         full = full and (turtle.getItemCount() > 0)
     end
     if not full then return end
@@ -218,7 +215,7 @@ HEIGHT = 3
 local function doStuff()
     for x = 2, LENGTH do
         moveClean()
-        if x % 20 == 0 then
+        if x % 5 == 0 then
             Turtle.checkInventory()
         end
     end
