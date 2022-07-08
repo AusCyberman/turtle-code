@@ -173,6 +173,7 @@ local function moveClean(posvec)
     local _, err = pcall(Turtle.move, posvec)
     if err then
         if err.code == ERRORS.OUT_OF_FUEL then
+            print("OUT OF FUEL!!!")
             bypassFuelCheck = true
             Turtle.moveTo(start_loc)
             print(err)
