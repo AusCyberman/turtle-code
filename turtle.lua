@@ -152,6 +152,7 @@ function Turtle.checkInventory()
         full = full and (turtle.getItemCount() > 0)
         i = i + 1
     end
+    turtle.select(i)
     if not full then return end
     local cleaned = false
     for i = 1, SLOTS_COUNT do
@@ -165,6 +166,7 @@ function Turtle.checkInventory()
     if not cleaned then
         error { code = ERRORS.INVENTORY_FULL }
     end
+    turtle.select(i)
 end
 
 local function moveClean(posvec)
