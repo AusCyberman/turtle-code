@@ -212,9 +212,9 @@ local function moveClean(posvec)
     Turtle.digDown()
 end
 
-WIDTH = 10
-LENGTH = 10
-HEIGHT = 10
+WIDTH = 100
+LENGTH = 100
+HEIGHT = 3
 
 
 local function doStuff()
