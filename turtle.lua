@@ -1,4 +1,4 @@
-Turtle ={}
+Turtle = {}
 local SLOTS_COUNT = 16
 
 local ERRORS = {
@@ -66,17 +66,18 @@ local bypassFuelCheck = false
 
 Turtle = {}
 
-Turtle.digUp = function () Turtle.dig("Up") end
-Turtle.digDown = function () Turtle.dig("Down") end
+Turtle.digUp = function() Turtle.dig("Up") end
+Turtle.digDown = function() Turtle.dig("Down") end
 function Turtle.dig(dir)
     dir = dir or ""
-    if turtle["detect"..dir]() then
-         Turtle.checkInventory()
-         if not turtle["dig"..dir]()  then
-            error({code = ERRORS.COULD_NOT_BREAK_BLOCK}) 
-         end
+    if turtle["detect" .. dir]() then
+        Turtle.checkInventory()
+        if not turtle["dig" .. dir]() then
+            error({ code = ERRORS.COULD_NOT_BREAK_BLOCK })
+        end
     end
- end
+end
+
 function Turtle.refuel()
     if bypassFuelCheck then return end
     local distance = start_loc:sub(directionVector)
@@ -141,9 +142,6 @@ function Turtle.moveTo(vec3)
     Turtle.move(diffVec)
 end
 
-
-
-
 function Turtle.checkInventory()
     local full = true
     local i = 1
@@ -182,13 +180,13 @@ local function moveClean(posvec)
             local oldPosVec = current_loc
             local oldDirVec = directionVector
             Turtle.moveTo(start_loc)
-            for i =1, SLOTS_COUNT do
+            for i = 1, SLOTS_COUNT do
                 turtle.select(i)
                 turtle.dropDown()
             end
             Turtle.checkInventory()
             local distance = start_loc:sub(oldPosVec)
-            if turtle.getFuelLevel() > distance.x + distance.y + distance.z then 
+            if turtle.getFuelLevel() > distance.x + distance.y + distance.z then
                 error("Out Of Fuel!")
             end
             Turtle.moveTo(oldPosVec)
@@ -197,7 +195,8 @@ local function moveClean(posvec)
             error(err)
         end
     end
-
+    Turtle.digUp()
+    Turtle.digDown()
 end
 
 WIDTH = 10
@@ -208,8 +207,6 @@ HEIGHT = 5
 local function doStuff()
     for x = 2, LENGTH do
         moveClean()
-        Turtle.digUp()
-        Turtle.digDown()
     end
 end
 
