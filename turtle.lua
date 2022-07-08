@@ -90,7 +90,7 @@ function Turtle.refuel()
         turtle.select(i)
         turtle.refuel()
     end
-    if turtle.getFuelLevel() > distance then
+    if turtle.getFuelLevel() < distance then
         error({ code = ERRORS.OUT_OF_FUEL })
     end
 
@@ -177,7 +177,6 @@ local function moveClean(posvec)
             print("OUT OF FUEL!!!")
             bypassFuelCheck = true
             Turtle.moveTo(start_loc)
-            print(err)
             error("Returned home!")
             moveClean(posvec)
         elseif err.code == ERRORS.INVENTORY_FULL then
