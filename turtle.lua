@@ -1,5 +1,3 @@
-vector = {}
-Turtle = {}
 local SLOTS_COUNT = 16
 
 local ERRORS = {
