@@ -68,6 +68,15 @@ Turtle = {}
 
 Turtle.digUp = function () Turtle.dig("Up") end
 Turtle.digDown = function () Turtle.dig("Down") end
+function Turtle.dig(dir)
+    dir = dir or ""
+    if turtle["detect"..dir]() then
+         Turtle.checkInventory()
+         if not turtle["dig"..dir]()  then
+            error({code = ERRORS.COULD_NOT_BREAK_BLOCK}) 
+         end
+    end
+ end
 function Turtle.refuel()
     if bypassFuelCheck then return end
     local distance = start_loc:sub(directionVector)
