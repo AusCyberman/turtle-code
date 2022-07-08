@@ -4,7 +4,8 @@ local SLOTS_COUNT = 16
 local ERRORS = {
     OUT_OF_FUEL = 69,
     INVENTORY_FULL = 71,
-    COULD_NOT_BREAK_BLOCK = 72
+    COULD_NOT_BREAK_BLOCK = 72,
+    COULD_NOT_MOVE = 32
 }
 
 function math.sign(n)
@@ -35,6 +36,11 @@ local function rotate(lr)
     turtle["turn" .. lr]()
     print("turning " .. lr)
 end
+
+local function moveRaw()
+    while not turtle.forward() do end
+end
+
 
 local function getTurnsToVec(avec, bvec)
     local dot = avec:dot(bvec)
@@ -99,9 +105,7 @@ function Turtle.moveForward(n, mut)
     for i = 1, math.abs(n) do
         Turtle.dig()
         Turtle.refuel()
-        if not turtle.forward()  then
-            error("Could not move forward")
-        end
+        moveRaw()
         print("at iteration:" .. i)
         current_loc = current_loc:add(mut)
     end
@@ -134,8 +138,7 @@ function Turtle.move(...)
         for i = 1, math.abs(y) do
             Turtle.refuel()
             Turtle.dig(dir)
-            if not turtle[string.lower(dir)]() then 
-                error("Could not move ".. dir) 
+            while not turtle[string.lower(dir)]() do
             end
             current_loc.y = current_loc.y + ((y > 0 and 1) or -1)
         end
@@ -149,15 +152,6 @@ end
 
 function Turtle.checkInventory()
     local full = true
-    local i = 1
-    while SLOTS_COUNT >= i and full do
-        turtle.select(i)
-        full = full and (turtle.getItemCount() > 0)
-        i = i + 1
-    end
-    turtle.select(1)
-    if not full then return end
-    local cleaned = false
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
         local det = turtle.getItemDetail().name
@@ -165,7 +159,10 @@ function Turtle.checkInventory()
             turtle.drop()
             cleaned = true
         end
+        full = full and (turtle.getItemCount() > 0)
     end
+    if not full then return end
+    local cleaned = false
     if not cleaned then
         error { code = ERRORS.INVENTORY_FULL }
     end
@@ -201,6 +198,10 @@ local function moveClean(posvec)
             Turtle.moveTo(oldPosVec)
             Turtle.setDirection(oldDirVec)
             moveClean(posvec)
+        elseif err.code == ERRORS.COULD_NOT_BREAK_BLOCK then
+            error("COULD NOT BREAK BLOCK")
+        elseif err.code == ERRORS.COULD_NOT_MOVE then
+            error("COULD NOT MOVE")
         else
             error(err)
         end
@@ -209,9 +210,9 @@ local function moveClean(posvec)
     Turtle.digDown()
 end
 
-WIDTH = 30
-LENGTH = 30
-HEIGHT = 30
+WIDTH = 10
+LENGTH = 10
+HEIGHT = 10
 
 
 local function doStuff()
