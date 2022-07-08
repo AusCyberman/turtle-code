@@ -74,7 +74,7 @@ setmetatable(Turtle,{ __index = function (key)
 end})
 
 function Turtle.dig(dir)
-   dig = dig or ""
+   dir = dir or ""
    if turtle["detect"..dir]() then
         Turtle.checkInventory()
         if not turtle["dig"..dir]()  then
