@@ -67,14 +67,14 @@ local bypassFuelCheck = false
 setmetatable(Turtle,{ __index = function (key) 
     local b,start = key:find("dig",1)
     if b ~= nil then
-        Turtle.dig(key:sub(start)) 
+        Turtle.dig(key:sub(start+1,#key)) 
     else 
         return Turtle[key]
     end
 end})
 
 function Turtle.dig(dir)
-   if turtle["detect"..dir] then
+   if turtle["detect"..dir]() then
         Turtle.checkInventory()
         if not turtle["dig"..dir]()  then
            error({code = ERRORS.COULD_NOT_BREAK_BLOCK}) 
