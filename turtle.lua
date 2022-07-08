@@ -206,9 +206,9 @@ local function moveClean(posvec)
     Turtle.digDown()
 end
 
-WIDTH = 10
-LENGTH = 10
-HEIGHT = 5
+WIDTH = 30
+LENGTH = 30
+HEIGHT = 30
 
 
 local function doStuff()
@@ -230,5 +230,5 @@ for i = 1, HEIGHT / 3 do
         rotate(b)
     end
     a, b = b, a
-    moveClean(vector.new(0, 3, 0))
+    moveClean(vector.new(0, -3, 0))
 end
