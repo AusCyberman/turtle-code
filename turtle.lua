@@ -67,7 +67,7 @@ local bypassFuelCheck = false
 Turtle = {}
 
 function Turtle.mt.__index(key) 
-    local b,start = string.find("dig",1)
+    local b,start = key:find("dig",1)
     if b ~= nil then
         Turtle.dig(key:sub(start)) 
     else 
@@ -155,7 +155,7 @@ function Turtle.checkInventory()
     local full = true
     local i = 1
     while SLOTS_COUNT >= i and full do
-        turtle.select(n)
+        turtle.select(i)
         full = full and turtle.getItemSpace() == 0
         i = i + 1
     end
