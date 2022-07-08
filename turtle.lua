@@ -158,14 +158,12 @@ function Turtle.checkInventory()
         local det = turtle.getItemDetail().name
         if det == "minecraft:cobblestone" or det == "minecraft:dirt" then
             turtle.drop()
-            cleaned = true
         end
     end
         full = full and (turtle.getItemCount() > 0)
     end
     if not full then return end
-    local cleaned = false
-    if not cleaned then
+    if full then
         error { code = ERRORS.INVENTORY_FULL }
     end
     turtle.select(1)
