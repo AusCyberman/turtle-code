@@ -224,6 +224,7 @@ local function doStuff()
             Turtle.checkInventory()
         end
     end
+    Turtle.checkInventory()
 end
 
 local a, b = LR.LEFT, LR.RIGHT
