@@ -156,8 +156,7 @@ function Turtle.checkInventory()
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
         local det = turtle.getItemDetail().name
-        print(det)
-        if det == "minecraft:stone" or det == "minecraft:dirt" then
+        if det == "minecraft:cobblestone" or det == "minecraft:dirt" then
             turtle.drop()
             cleaned = true
         end
@@ -180,7 +179,7 @@ local function moveClean(posvec)
             error("Returned home!")
             moveClean(posvec)
         elseif err.code == ERRORS.INVENTORY_FULL then
-            print(inventory full)
+            print("inventory full")
             local oldPosVec = current_loc
             local oldDirVec = directionVector
             Turtle.moveTo(start_loc)
