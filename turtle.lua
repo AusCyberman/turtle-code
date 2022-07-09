@@ -1,12 +1,20 @@
 Turtle = {}
 local SLOTS_COUNT = 16
-
 local ERRORS = {
-    OUT_OF_FUEL = 69,
-    INVENTORY_FULL = 71,
-    COULD_NOT_BREAK_BLOCK = 72,
-    COULD_NOT_MOVE = 32
+    OUT_OF_FUEL = 1,
+    INVENTORY_FULL = 2,
+    COULD_NOT_BREAK_BLOCK = 3,
+    COULD_NOT_MOVE = 4
 }
+
+local ERRMSGS = {
+    [ERRORS.OUT_OF_FUEL] = "Out of Fuel",
+    [ERRORS.INVENTORY_FULL] = "Inventory Full",
+    [ERRORS.COULD_NOT_BREAK_BLOCK] = "Could not break block",
+    [ERRORS.COULD_NOT_MOVE] = "Could not move"
+}
+
+
 
 function math.sign(n)
     return (n > 0 and 1) or (n == 0 and 0) or -1
@@ -31,7 +39,7 @@ local function rot_vec(vec, lr)
     end
 end
 
-local function rotate(lr)
+function Turtle.rotate(lr)
     directionVector = rot_vec(directionVector:normalize(), lr)
     turtle["turn" .. lr]()
     print("turning " .. lr)
@@ -70,14 +78,14 @@ local bypassFuelCheck = false
 
 Turtle = {}
 
-Turtle.digUp = function() Turtle.dig("Up") end
-Turtle.digDown = function() Turtle.dig("Down") end
+Turtle.digUp = function() Turtle.dig(DIR.UP) end
+Turtle.digDown = function() Turtle.dig(DIR.DOWN) end
 function Turtle.dig(dir)
     dir = dir or ""
     if turtle["detect" .. dir]() then
         turtle.select(1)
         if not turtle["dig" .. dir]() then
-            error({ code = ERRORS.COULD_NOT_BREAK_BLOCK })
+            coroutine.yield { code = ERRORS.COULD_NOT_BREAK_BLOCK }
         end
     end
 end
@@ -95,7 +103,7 @@ function Turtle.refuel()
         turtle.refuel()
     end
     if turtle.getFuelLevel() <= distance then
-        error({ code = ERRORS.OUT_OF_FUEL })
+        coroutine.yield { code = ERRORS.OUT_OF_FUEL }
     end
 
 end
@@ -112,39 +120,41 @@ end
 
 function Turtle.move(...)
     local args = { ... }
-    local x, y, z
-    if #args == 3 then
-        x, y, z = table.unpack(args)
-    else
-        x, y, z = args[1].x, args[1].y, args[1].z
-    end
-    if x ~= 0 then
-        print("moving on x")
-        local angleVec = vector.new(x / math.abs(x), 0, 0)
-        set_direction(angleVec)
-        Turtle.moveForward(x, angleVec)
-    end
-    if z ~= 0 then
-        print("moving on z")
-        local angleVec = vector.new(0, 0, z / math.abs(z))
-        set_direction(angleVec)
-        Turtle.moveForward(z, angleVec)
-    end
-    if y ~= 0 then
-        local dir = (y > 0 and DIR.UP) or DIR.DOWN
-        for i = 1, math.abs(y) do
-            Turtle.refuel()
-            Turtle.dig(dir)
-            while not turtle[string.lower(dir)]() do
-            end
-            current_loc.y = current_loc.y + ((y > 0 and 1) or -1)
+    return coroutine.create(function()
+        local x, y, z
+        if #args == 3 then
+            x, y, z = table.unpack(args)
+        else
+            x, y, z = args[1].x, args[1].y, args[1].z
         end
-    end
+        if x ~= 0 then
+            print("moving on x")
+            local angleVec = vector.new(x / math.abs(x), 0, 0)
+            set_direction(angleVec)
+            Turtle.moveForward(x, angleVec)
+        end
+        if z ~= 0 then
+            print("moving on z")
+            local angleVec = vector.new(0, 0, z / math.abs(z))
+            set_direction(angleVec)
+            Turtle.moveForward(z, angleVec)
+        end
+        if y ~= 0 then
+            local dir = (y > 0 and DIR.UP) or DIR.DOWN
+            for i = 1, math.abs(y) do
+                Turtle.refuel()
+                Turtle.dig(dir)
+                while not turtle[string.lower(dir)]() do
+                end
+                current_loc.y = current_loc.y + ((y > 0 and 1) or -1)
+            end
+        end
+    end)
 end
 
 function Turtle.moveTo(vec3)
-    local diffVec = current_loc:sub(vec3)
-    Turtle.move(diffVec)
+    local diffVec = vec3:sub(current_loc)
+    return Turtle.move(diffVec)
 end
 
 function Turtle.checkInventory()
@@ -161,7 +171,7 @@ function Turtle.checkInventory()
     end
     if not full then return end
     if full then
-        error { code = ERRORS.INVENTORY_FULL }
+        coroutine.yield { code = ERRORS.INVENTORY_FULL }
     end
     turtle.select(1)
 end
@@ -170,37 +180,44 @@ local function moveClean(posvec)
     posvec = posvec or directionVector
     print("dirvec " .. posvec:tostring())
     print("moving to " .. current_loc:add(posvec):tostring())
-    local _, err = pcall(Turtle.move, posvec)
-    if err then
-        if err.code == ERRORS.OUT_OF_FUEL then
+    local co = Turtle.move(posvec)
+    local function iterate(co)
+        return function() local code, res = coroutine.resume(co)
+            return res
+        end
+    end
+
+    for res in iterate(co) do
+        if res.code == ERRORS.OUT_OF_FUEL then
             print("OUT OF FUEL!!!")
-            bypassFuelCheck = true
-            Turtle.moveTo(start_loc)
-            error("Returned home!")
-            moveClean(posvec)
-        elseif err.code == ERRORS.INVENTORY_FULL then
+            local co = Turtle.moveTo(start_loc)
+            for res in iterate(co) do
+                if res.code ~= ERRORS.OUT_OF_FUEL then
+                    error("Could not return home" .. ERRMSGS[res.code])
+                end
+            end
+            error("Returned home, out of fuel!!")
+        elseif res.code == ERRORS.INVENTORY_FULL then
             print("inventory full")
             local oldPosVec = current_loc
             local oldDirVec = directionVector
-            Turtle.moveTo(start_loc)
+            for b in iterate(Turtle.moveTo(start_loc)) do
+                error("Could not return home: " .. ERRMSGS[b.code])
+            end
             for i = 1, SLOTS_COUNT do
                 turtle.select(i)
                 turtle.dropDown()
             end
             Turtle.checkInventory()
-            local distance = start_loc:sub(oldPosVec)
-            if turtle.getFuelLevel() > distance.x + distance.y + distance.z then
-                error("Out Of Fuel!")
+            local distance = oldPosVec:sub(start_loc)
+            if turtle.getFuelLevel() < math.abs(distance.x) + math.abs(distance.y) + math.abs(distance.z) then
+                error("Not enough fuel to return to original location")
             end
             Turtle.moveTo(oldPosVec)
             Turtle.setDirection(oldDirVec)
             moveClean(posvec)
-        elseif err.code == ERRORS.COULD_NOT_BREAK_BLOCK then
-            error("COULD NOT BREAK BLOCK")
-        elseif err.code == ERRORS.COULD_NOT_MOVE then
-            error("COULD NOT MOVE")
         else
-            error(err)
+            error("ERROR:" .. ERRMSGS[res.code])
         end
     end
     Turtle.digUp()
@@ -212,7 +229,7 @@ LENGTH = 100
 HEIGHT = 3
 
 
-local function doStuff()
+local function doLine()
     for x = 2, LENGTH do
         moveClean()
         if x % 5 == 0 then
@@ -225,14 +242,17 @@ end
 local a, b = LR.LEFT, LR.RIGHT
 for i = 1, HEIGHT / 3 do
     for n = 1, WIDTH / 2 do
-        doStuff()
-        rotate(a)
+        --[[
+        This does a full line, rotates around, then
+        --]]
+        doLine()
+        Turtle.rotate(a)
         moveClean()
-        rotate(a)
-        doStuff()
-        rotate(b)
+        Turtle.rotate(a)
+        doLine()
+        Turtle.rotate(b)
         moveClean()
-        rotate(b)
+        Turtle.rotate(b)
     end
     a, b = b, a
     moveClean(vector.new(0, 3, 0))
