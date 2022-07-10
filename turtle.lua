@@ -70,10 +70,9 @@ local function getTurnsToVec(avec, bvec)
             return { LR.LEFT }
         end
     end
-
 end
 
-local function set_direction(vec)
+function Turtle.set_direction(vec)
     for _, dir in ipairs(getTurnsToVec(directionVector, vec)) do
         turtle["turn" .. dir]()
     end
@@ -82,8 +81,6 @@ end
 
 local bypassFuelCheck = false
 
-
-Turtle = {}
 
 Turtle.digUp = function() Turtle.dig(DIR.UP) end
 Turtle.digDown = function() Turtle.dig(DIR.DOWN) end
@@ -136,13 +133,13 @@ function Turtle.move(...)
         if x ~= 0 then
             print("moving on x")
             local angleVec = vector.new(x / math.abs(x), 0, 0)
-            set_direction(angleVec)
+            Turtle.set_direction(angleVec)
             Turtle.moveForward(x)
         end
         if z ~= 0 then
             print("moving on z")
             local angleVec = vector.new(0, 0, z / math.abs(z))
-            set_direction(angleVec)
+            Turtle.set_direction(angleVec)
             Turtle.moveForward(z)
         end
         if y ~= 0 then
@@ -163,13 +160,36 @@ function Turtle.moveTo(vec3)
     return Turtle.move(diffVec)
 end
 
+local badBlocks = setmetatable(
+    {
+        "minecraft:dirt",
+        "minecraft:grass",
+        "minecraft:stone",
+        "minecraft:cobblestone",
+        "minecraft:diorite",
+        "minecraft:andesite",
+        "minecraft:granite",
+        "galacticraft:moon_turf",
+    },
+    {
+        __index = function(t, k)
+            for _, v in ipairs(t) do
+                if v == k then
+                    return true
+                end
+            end
+            return false
+        end
+    }
+)
+
 function Turtle.checkInventory()
     local full = true
     for i = 1, SLOTS_COUNT do
         turtle.select(i)
         if turtle.getItemCount() > 0 then
             local det = turtle.getItemDetail().name
-            if det == "minecraft:cobblestone" or det == "minecraft:dirt" or det == "minecraft.stone" then
+            if badBlocks[det] then
                 turtle.drop()
             end
         end
