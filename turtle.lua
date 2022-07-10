@@ -46,7 +46,14 @@ function Turtle.rotate(lr)
 end
 
 local function moveRaw()
-    while not turtle.forward() do end
+    local i = 0
+    while not turtle.forward() and i < 20 do
+        i = i + 1
+        Turtle.dig()
+    end
+    if i > 20 then
+        coroutine.yield { code = ERRORS.COULD_NOT_MOVE }
+    end
 end
 
 local function getTurnsToVec(avec, bvec)
@@ -108,13 +115,12 @@ function Turtle.refuel()
 
 end
 
-function Turtle.moveForward(n, mut)
+function Turtle.moveForward(n)
     for i = 1, math.abs(n) do
-        Turtle.dig()
         Turtle.refuel()
         moveRaw()
         print("at iteration:" .. i)
-        current_loc = current_loc:add(mut)
+        current_loc = current_loc:add(directionVector)
     end
 end
 
@@ -131,20 +137,20 @@ function Turtle.move(...)
             print("moving on x")
             local angleVec = vector.new(x / math.abs(x), 0, 0)
             set_direction(angleVec)
-            Turtle.moveForward(x, angleVec)
+            Turtle.moveForward(x)
         end
         if z ~= 0 then
             print("moving on z")
             local angleVec = vector.new(0, 0, z / math.abs(z))
             set_direction(angleVec)
-            Turtle.moveForward(z, angleVec)
+            Turtle.moveForward(z)
         end
         if y ~= 0 then
             local dir = (y > 0 and DIR.UP) or DIR.DOWN
             for i = 1, math.abs(y) do
                 Turtle.refuel()
-                Turtle.dig(dir)
                 while not turtle[string.lower(dir)]() do
+                    Turtle.dig(dir)
                 end
                 current_loc.y = current_loc.y + ((y > 0 and 1) or -1)
             end
@@ -216,6 +222,20 @@ local function moveClean(posvec)
             Turtle.moveTo(oldPosVec)
             Turtle.setDirection(oldDirVec)
             moveClean(posvec)
+        elseif ERRORS.COULD_NOT_MOVE then
+            Turtle.move()
+            local function b(lr)
+                return coroutine.yield(function()
+                    Turtle.rotate(lr)
+                    Turtle.moveForward(2)
+                end)
+            end
+
+            if b(LR.LEFT).resume() and
+                b(LR.RIGHT).resume() and
+                Turtle.move(0, 1, 0).resume() and Turtle.move(0, -1, 0).resume() then
+                error("Could not move")
+            end
         else
             error("ERROR:" .. ERRMSGS[res.code])
         end
