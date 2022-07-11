@@ -18,6 +18,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb07d2053ccdbe10e2af2995a2f116c1330396493dc1269f6a91d0ae82e19704"
 
 [[package]]
+name = "async-tungstenite"
+version = "0.17.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1b71b31561643aa8e7df3effe284fa83ab1a840e52294c5f4bd7bfd8b2becbb"
+dependencies = [
+ "futures-io",
+ "futures-util",
+ "log",
+ "pin-project-lite",
+ "tungstenite",
+]
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -72,6 +85,7 @@ name = "cc-tweaked-turtle-program"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-tungstenite",
  "env_logger",
  "futures",
  "futures-util",
@@ -80,6 +94,8 @@ dependencies = [
  "lazy_static",
  "log",
  "tokio",
+ "tokio-stream",
+ "tokio-tungstenite",
  "tungstenite",
 ]
 
@@ -742,10 +758,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-stream"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df54d54117d6fdc4e4fea40fe1e4e566b3505700e148a6827e59b34b0d2600d9"
+dependencies = [
+ "futures-core",
+ "pin-project-lite",
+ "tokio",
+]
+
+[[package]]
 name = "tokio-tungstenite"
 version = "0.17.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06cda1232a49558c46f8a504d5b93101d42c0bf7f911f12a105ba48168f821ae"
+source = "git+https://github.com/snapview/tokio-tungstenite/#7967efe0d64cd11308e1f3b75d6a3fa653a7af3d"
 dependencies = [
  "futures-util",
  "log",
